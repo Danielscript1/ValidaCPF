@@ -1,0 +1,126 @@
+create or replace function GERA_CPF_ALEATORIO
+
+RETURN VARCHAR2 AS
+
+
+
+ Multiplicador INTEGER;
+
+ Soma1 INTEGER := 0;
+
+ Soma2 INTEGER := 0;
+
+ Resto1 INTEGER;
+
+ Resto2 INTEGER;
+
+ Digito1 CHAR(1);
+
+ Digito2 CHAR(1);
+
+ CPF_GERADO VARCHAR2(15);
+
+ CPF_ALEATORIO_VALIDADO VARCHAR2(15) := '' ;
+
+BEGIN
+
+
+
+ --Gera CPF Aleatorio 123.456.789
+
+ CPF_GERADO := '';
+
+ FOR I IN 1..9 LOOP
+
+   -- Usa a funcao GERA_DIGITO para gerar um digito aleatorio.
+
+   CPF_GERADO := CPF_GERADO || GERA_DIGITO; 
+
+ END LOOP;
+
+ 
+
+ -- Gerar o Primeiro Dígito do CPF: 123.456.789 
+
+ Multiplicador := 10;
+
+ FOR i IN 1..9 LOOP
+
+  SOMA1 := SOMA1 + (SubStr(CPF_GERADO, i, 1) * Multiplicador);
+
+  Multiplicador := Multiplicador - 1;
+
+ END LOOP;
+
+ Resto1 := MOD(Soma1*10, 11);
+
+ If Resto1 = 10 then
+
+  Digito1 := '0';
+
+ Else
+
+  Digito1 := Resto1;
+
+ END IF; 
+
+
+
+ -- Gerar o Segundo Dígito CPF: 123.456.789-2
+
+ Multiplicador := 11;
+
+ FOR i IN 1..10 LOOP
+
+  SOMA2 := SOMA2 + (SubStr(CPF_GERADO||Digito1, i, 1) * Multiplicador);
+
+  Multiplicador := Multiplicador - 1;
+
+ END LOOP;
+
+ Resto2 := MOD(Soma2*10, 11);
+
+ If Resto2 = 10 then
+
+  Digito2 := '0';
+
+ Else
+
+  Digito2 := Resto2;
+
+ END IF;
+
+
+
+ CPF_ALEATORIO_VALIDADO := CPF_GERADO || Digito1 || Digito2;
+
+
+
+ RETURN CPF_ALEATORIO_VALIDADO;
+
+END;
+
+/
+gera digito 
+
+CREATE OR REPLACE FUNCTION GERA_DIGITO
+
+RETURN CHAR
+
+AS
+
+  DIGITO CHAR(1);
+
+BEGIN
+
+  select trunc(dbms_random.value*10) 
+
+  INTO DIGITO
+
+  from dual; 
+
+  RETURN DIGITO; 
+
+end;
+
+/
